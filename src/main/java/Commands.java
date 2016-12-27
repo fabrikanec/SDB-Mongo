@@ -7,23 +7,21 @@ import java.util.*;
 import java.sql.Date;
 
 interface Operation {
-    int call( String... expr) throws Exception;
+    int call(String... expr) throws Exception;
 }
 
 public class Commands {
-
+    private static final String url = "localhost";
+    private static final Integer port = 27017;
     private List<Operation> ops;
-    Jedis jedis = new Jedis("localhost");
-    private EngineDBLibrary lib = new EngineDBLibrary("localhost" , 27017 );
+    private Jedis jedis = new Jedis(url);
+    private EngineDBLibrary lib = new EngineDBLibrary(url, port);
 
     public enum Opcodes {
-        ADD, UPDATE, DELETE, LIST, BUYGAME,seeAcqGames, UPDATEMONEY, FINDGAMES
+        ADD, UPDATE, DELETE, LIST, BUYGAME, SEEACQGAMES, UPDATEMONEY, FINDGAMES
     }
 
-
-    String result;
-
-    Commands( ) {
+    Commands() {
         ops = new ArrayList<>();
         ops.add(this::add);
         ops.add(this::update);
@@ -35,20 +33,19 @@ public class Commands {
         ops.add(this::findgames);
     }
 
-    public List<Operation> getOps() { return this.ops;}
+    public List<Operation> getOps() { return this.ops; }
 
-    private int add( String...  params ) throws Exception {
+    public int add(String... params) throws Exception {
         int res = 0;
         System.err.println("add called");
         // type
-        switch( params[0] ) {
+        switch(params[0]) {
             case "users":
-                System.err.println("users");
                 try {
                     res = lib.createUser(params[1]);
                     jedis.set(String.valueOf(params[1].hashCode()),params[1] + "0");
                     break;
-                } catch( Exception e ) {
+                } catch(Exception e) {
                     System.err.println("add error " + params.length + params.toString());
                     throw e;
                 }
@@ -56,13 +53,17 @@ public class Commands {
                 try {
                     res = lib.createGame(params[1], Integer.valueOf(params[2]), params[3],
                             null, params[5], Integer.valueOf(params[6]),
-                            Date.valueOf(params[7]), Integer.valueOf(params[8])
-                    );
-                    jedis.set(String.valueOf(params[1].hashCode()),params[1] +" "+ params[2]+" " + params[3] + " "+
-                            params[5] + " " +
-                            params[6] + " " + params[7]+ " " + params[8]);
+                            Date.valueOf(params[7]), Integer.valueOf(params[8]));
+                    
+                    jedis.set(String.valueOf(params[1].hashCode()), params[1] + " " 
+                            + params[2] + " " 
+                            + params[3] + " " 
+                            + params[5] + " " 
+                            + params[6] + " " 
+                            + params[7] + " " 
+                            + params[8]);
 
-                } catch ( Exception e) {
+                } catch (Exception e) {
                     throw e;
                 }
                 break;
@@ -70,25 +71,26 @@ public class Commands {
                 try {
                     res = lib.createCommunity(params[1], params[2]);
                     jedis.set(String.valueOf(params[1].hashCode()), params[1] + " " + params[2]);
-                } catch( Exception e ) {
+                } catch(Exception e) {
                         throw e;
                 }
                 break;
             case "Events":
                 try {
-                    res = lib.createEvent( params[1],Integer.valueOf(params[2]), params[3], Integer.valueOf(params[4]),
-                            java.sql.Date.valueOf(params[5]), Integer.valueOf(params[6]));
+                    res = lib.createEvent(params[1],Integer.valueOf(params[2]), params[3], Integer.valueOf(params[4]), 
+                                          java.sql.Date.valueOf(params[5]), Integer.valueOf(params[6]));
+                    
                     jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]+" " + params[3] + " "+
-                            Integer.valueOf(params[4])+" "+ params[5]+" "+params[6]);
-                } catch( Exception e ) {
+                                             Integer.valueOf(params[4])+" "+ params[5]+" "+params[6]);
+                } catch(Exception e) {
                     throw e;
                 }
                 break;
             case "Articles":
                 try {
-                    res = lib.createArticles( params[1], params[2], Integer.valueOf(params[3]));
+                    res = lib.createArticles(params[1], params[2], Integer.valueOf(params[3]));
                     jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]+" " + params[3]);
-                } catch( Exception e ) {
+                } catch(Exception e) {
                     throw e;
                 }
                 break;
@@ -96,7 +98,7 @@ public class Commands {
                 try {
                     res = lib.createDevelopers(params[1], params[2]);
                     jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]);
-                } catch( Exception e ) {
+                } catch(Exception e) {
                     throw e;
                 }
                 break;
@@ -104,7 +106,7 @@ public class Commands {
                 try {
                     res = lib.addUserToComminuty(params[1], params[2]);
                     jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]);
-                } catch( Exception e ) {
+                } catch(Exception e) {
                     throw e;
                 }
                 break;
@@ -114,46 +116,46 @@ public class Commands {
 
         return res;
     }
-    private int update( String... params ) throws Exception {
+    public int update(String... params) throws Exception {
         jedis.del(params[1]);
         int res = 0;
         System.out.println("Called update.");
         try {
             switch (params[0]) {
                 case "users":
-                    res = lib.updateUser( params[1], params[2], Integer.valueOf(params[3]));
+                    res = lib.updateUser(params[1], params[2], Integer.valueOf(params[3]));
                     break;
                 case "games":
-                    res = lib.updateGame( params[1], params[2], Integer.valueOf(params[3]),
+                    res = lib.updateGame(params[1], params[2], Integer.valueOf(params[3]),
                                           params[4], null, Integer.valueOf(params[5]));
                     break;
                 case "communities":
-                    res = lib.updateCommunity( params[1], params[2], params[3]);
+                    res = lib.updateCommunity(params[1], params[2], params[3]);
                     break;
                 case "Events":
-                    res = lib.updateEvent( params[1], params[2],params[3],
+                    res = lib.updateEvent(params[1], params[2],params[3],
                             Integer.valueOf(params[4]), java.sql.Date.valueOf(params[5]));
                     break;
                 case "Articles":
-                    res = lib.updateArticles( params[1], params[2],params[3]);
+                    res = lib.updateArticles(params[1], params[2],params[3]);
                     break;
                 case "developers":
                     res = lib.updateDevelopers(params[1],params[2], params[3]);
                     break;
             }
-        } catch( Exception e ) {
+        } catch(Exception e) {
             throw e;
         }
         return res;
     }
-    private int delete( String... params ) throws Exception{
+    public int delete(String... params) throws Exception{
         jedis.del(params[1]);
         int res = 0;
         System.out.println("Called delete " + params[0]);
         try{
-            switch( params[0] ) {
+            switch(params[0]) {
                 case "users":
-                    res = lib.deleteUser( params[1]);
+                    res = lib.deleteUser(params[1]);
                     break;
                 case "games":
                     res = lib.deleteGame(params[1]);
@@ -174,7 +176,7 @@ public class Commands {
                     try {
                         res = lib.deleteUserFromCommunity(params[1], params[2]);
                         jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]);
-                    } catch( Exception e ) {
+                    } catch(Exception e) {
                         throw e;
                     }
             }
@@ -183,27 +185,27 @@ public class Commands {
         }
         return res;
     }
-    private int list( String... params ) throws Exception{
+    public int list(String... params) throws Exception{
         System.out.println("Called list");
-        switch( params[0] ) {
+        switch(params[0]) {
             case "users":
                 try {
                     lib.viewUsers(params[1]);
-                } catch( Exception e ) {
+                } catch(Exception e) {
                     throw e;
                 }
                 break;
             case "games":
                 try {
                         lib.viewGames(params[1]);
-                } catch( Exception e ) {
+                } catch(Exception e) {
                     throw e;
                 }
                 break;
                 case "communities":
                     try {
                             lib.viewCommunities(params[1]);
-                    } catch( Exception e ) {
+                    } catch(Exception e) {
                         throw e;
                     }
                     break;
@@ -211,21 +213,21 @@ public class Commands {
                     try {
                             lib.viewEvents(params[1]);
                     }
-                     catch( Exception e ) {
+                     catch(Exception e) {
                         throw e;
                     }
                     break;
                 case "Articles":
                     try {
                             lib.viewArticles(params[1]);
-                    } catch( Exception e ) {
+                    } catch(Exception e) {
                         throw e;
                     }
                     break;
             case "developers":
                 try {
                         lib.viewDevelopers(params[1]);
-                } catch( Exception e ) {
+                } catch(Exception e) {
                     throw e;
                 }
                 break;
@@ -233,7 +235,7 @@ public class Commands {
                 try {
                     lib.viewUsersComminities(params[1]);
                     jedis.set(String.valueOf(params[1].hashCode()), params[1]);
-                } catch( Exception e ) {
+                } catch(Exception e) {
                     throw e;
                 }
                 break;
@@ -241,7 +243,7 @@ public class Commands {
         return 0;
     }
 
-    private int buygame( String... params ) throws Exception{
+    public int buygame(String... params) throws Exception{
         int res = 0;
         try {
             System.out.println("Called buygame");
@@ -253,7 +255,7 @@ public class Commands {
         return res;
     }
 
-    private int seeAcquiredGames( String... params ) throws Exception{
+    public int seeAcquiredGames(String... params) throws Exception{
         int res = 0;
         try {
             System.out.println("Called seeAcquiredGames");
@@ -265,7 +267,7 @@ public class Commands {
         return res;
     }
 
-    private int updatemoney( String... params ) throws Exception{
+    public int updatemoney(String... params) throws Exception{
         int res = 0;
         try{
             System.out.println("Called updatemoney");
@@ -277,7 +279,7 @@ public class Commands {
         return res;
     }
 
-    private int findgames( String... params ) throws Exception {
+    public int findgames(String... params) throws Exception {
         int res = 0;
         try{
             System.out.println("Called findgames");
