@@ -6,17 +6,13 @@ import java.sql.Date;
 import java.util.*;
 
 public class EngineDBLibrary {
-    private final String url;
-    private final Integer port;
     private MongoClient mongo;
     private DB db;
     private Jedis jedis;
 
     EngineDBLibrary(String url, Integer port) {
-        this.url = url;
-        this.port = port;
         this.jedis = new Jedis(url);
-        this.mongo = new MongoClient("localhost", 27017);
+        this.mongo = new MongoClient(url, port);
         this.db = mongo.getDB("EngineDB");
     }
 
@@ -124,11 +120,11 @@ public class EngineDBLibrary {
         return res;
     }
 
-    public Integer findGamesByGenre(String genre) throws Exception {
+    public Integer findmusicsByGenre(String genre) throws Exception {
         Integer res;
 
         try {
-            DBCollection table = db.getCollection("games");
+            DBCollection table = db.getCollection("musics");
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put("genre", genre);
             DBCursor cursor = table.find(searchQuery);
@@ -144,13 +140,13 @@ public class EngineDBLibrary {
         return res;
     }
 
-    public Integer buyGame(String userName, String gameName) throws Exception {
+    public Integer buymusic(String userName, String musicName) throws Exception {
         Integer res;
 
         try {
             DBCollection table1 = db.getCollection("users");
-            DBCollection table2 = db.getCollection("games");
-            DBCollection table3 = db.getCollection("acquiredGames");
+            DBCollection table2 = db.getCollection("musics");
+            DBCollection table3 = db.getCollection("acquiredmusics");
 
             //get money of the user
             BasicDBObject searchQuery = new BasicDBObject();
@@ -158,9 +154,9 @@ public class EngineDBLibrary {
             DBObject result = table1.findOne(searchQuery);
             Integer money = Integer.valueOf(result.get("money").toString());
 
-            //get cost of the game
+            //get cost of the music
             BasicDBObject searchQuery2 = new BasicDBObject();
-            searchQuery2.put("name", gameName);
+            searchQuery2.put("name", musicName);
             DBObject result2 = table2.findOne(searchQuery2);
             Integer cost = Integer.valueOf(result2.get("cost").toString());
 
@@ -174,10 +170,10 @@ public class EngineDBLibrary {
                 updateObj.put("$set", newDocument);
                 table1.update(query, updateObj);
 
-                //insert into acquried games collection
+                //insert into acquried musics collection
                 BasicDBObject document = new BasicDBObject();
                 document.put("userName", userName);
-                document.put("gameName", gameName);
+                document.put("musicName", musicName);
                 table3.insert(document);
             } else {
                 System.out.println("Not enough money");
@@ -332,17 +328,17 @@ public class EngineDBLibrary {
 
     public Integer createEvent(String name, Integer authorId, String content,
                                Integer rating, Date creationDate,
-                               Integer gameId) throws Exception {
+                               Integer musicId) throws Exception {
         Integer res;
         try {
-            DBCollection table = db.getCollection("Events");
+            DBCollection table = db.getCollection("events");
             BasicDBObject document = new BasicDBObject();
             document.put("name", name);
             document.put("authorId", authorId);
             document.put("content", content);
             document.put("rating", rating);
             document.put("creationDate", creationDate);
-            document.put("gameId", gameId);
+            document.put("musicId", musicId);
             table.insert(document);
             res = 0;
         } catch (Exception e) {
@@ -533,13 +529,13 @@ public class EngineDBLibrary {
         }
     }
 
-    public Integer createGame(String name, Integer cost, String description, Blob trailer, String genre,
+    public Integer createmusic(String name, Integer cost, String description, Blob trailer, String genre,
                               Integer developerId, Date releaseDate, Integer sizeBytes)
             throws Exception {
         Integer res;
 
         try {
-            DBCollection table = db.getCollection("games");
+            DBCollection table = db.getCollection("musics");
             BasicDBObject document = new BasicDBObject();
             document.put("name", name);
             document.put("cost", cost);
@@ -558,12 +554,12 @@ public class EngineDBLibrary {
         return res;
     }
 
-    public Integer updateGame(String name, String upname, Integer cost, String description, Blob trailer,
+    public Integer updatemusic(String name, String upname, Integer cost, String description, Blob trailer,
                               Integer sizeBytes) throws Exception {
         Integer res;
 
         try {
-            DBCollection table = db.getCollection("games");
+            DBCollection table = db.getCollection("musics");
             BasicDBObject query = new BasicDBObject();
             query.put("name", name);
             BasicDBObject newDocument = new BasicDBObject();
@@ -583,11 +579,11 @@ public class EngineDBLibrary {
         return res;
     }
 
-    public Integer deleteGame(String name) throws Exception {
+    public Integer deletemusic(String name) throws Exception {
         Integer res;
 
         try {
-            DBCollection table = db.getCollection("games");
+            DBCollection table = db.getCollection("musics");
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put("name", name);
             table.remove(searchQuery);
@@ -599,26 +595,26 @@ public class EngineDBLibrary {
         return res;
     }
 
-    public void viewGames(String name) throws Exception {
+    public void viewmusics(String name) throws Exception {
         try {
-            DBCollection table = db.getCollection("games");
+            DBCollection table = db.getCollection("musics");
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put("name", name);
             DBCursor cursor = table.find(searchQuery);
 
             while (cursor.hasNext()) {
-                DBObject game = cursor.next();
-                System.out.println(game);
-                jedis.set(String.valueOf(game.hashCode()), String.valueOf(game));
+                DBObject music = cursor.next();
+                System.out.println(music);
+                jedis.set(String.valueOf(music.hashCode()), String.valueOf(music));
             }
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public void seeAcquiredGames() throws Exception {
+    public void seeAcquiredmusics() throws Exception {
         try {
-            DBCollection table = db.getCollection("acquiredGames");
+            DBCollection table = db.getCollection("acquiredmusics");
             BasicDBObject searchQuery = new BasicDBObject();
             DBCursor cursor = table.find(searchQuery);
 

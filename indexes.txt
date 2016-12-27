@@ -1,6 +1,6 @@
 db.users.createIndex({"name" : 1}, {"unique" : true})
-db.games.createIndex({"name" : 1}, {"unique" : true})
-db.games.createIndex({"genre" : 1}
+db.musics.createIndex({"name" : 1}, {"unique" : true})
+db.musics.createIndex({"genre" : 1})
 db.events.createIndex({"name" : 1}, {"unique" : true})
 db.articles.createIndex({"name" : 1}, {"unique" : true})
 db.communities.createIndex({"name" : 1}, {"unique" : true})

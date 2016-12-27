@@ -24,17 +24,17 @@ public class Main {
             case "list":
                 cmd_type = Commands.Opcodes.LIST;
                 break;
-            case "buygame":
-                cmd_type = Commands.Opcodes.BUYGAME;
+            case "buymusic":
+                cmd_type = Commands.Opcodes.BUYmusic;
                 break;
-            case "seeAcqGames":
-                cmd_type = Commands.Opcodes.SEEACQGAMES;
+            case "seeAcqmusics":
+                cmd_type = Commands.Opcodes.SEEACQmusicS;
                 break;
             case "updatemoney":
                 cmd_type = Commands.Opcodes.UPDATEMONEY;
                 break;
-            case "findgames":
-                cmd_type = Commands.Opcodes.FINDGAMES;
+            case "findmusics":
+                cmd_type = Commands.Opcodes.FINDmusicS;
                 break;
             default:
                 System.err.println("Error: ``" + cmd + "`` not found.");
@@ -45,7 +45,7 @@ public class Main {
 
     public void run() {
         String[] tokens;
-        String line = null;
+        String line;
         Scanner sc = new Scanner(System.in);
         Commands cmd = new Commands();
         Commands.Opcodes cmd_type;
@@ -63,6 +63,9 @@ public class Main {
                     System.out.println("OK");
                 }
             } catch (NullPointerException e) {
+                continue;
+            } catch(com.mongodb.DuplicateKeyException e){
+                System.out.println("Duplicate.");
                 continue;
             } catch (Exception e) {
                 e.printStackTrace();

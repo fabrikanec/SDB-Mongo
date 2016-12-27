@@ -18,7 +18,7 @@ public class Commands {
     private EngineDBLibrary lib = new EngineDBLibrary(url, port);
 
     public enum Opcodes {
-        ADD, UPDATE, DELETE, LIST, BUYGAME, SEEACQGAMES, UPDATEMONEY, FINDGAMES
+        ADD, UPDATE, DELETE, LIST, BUYmusic, SEEACQmusicS, UPDATEMONEY, FINDmusicS
     }
 
     Commands() {
@@ -27,10 +27,10 @@ public class Commands {
         ops.add(this::update);
         ops.add(this::delete);
         ops.add(this::list);
-        ops.add(this::buygame);
-        ops.add(this::seeAcquiredGames);
+        ops.add(this::buymusic);
+        ops.add(this::seeAcquiredmusics);
         ops.add(this::updatemoney);
-        ops.add(this::findgames);
+        ops.add(this::findmusics);
     }
 
     public List<Operation> getOps() { return this.ops; }
@@ -49,9 +49,9 @@ public class Commands {
                     System.err.println("add error " + params.length + params.toString());
                     throw e;
                 }
-            case "games":
+            case "musics":
                 try {
-                    res = lib.createGame(params[1], Integer.valueOf(params[2]), params[3],
+                    res = lib.createmusic(params[1], Integer.valueOf(params[2]), params[3],
                             null, params[5], Integer.valueOf(params[6]),
                             Date.valueOf(params[7]), Integer.valueOf(params[8]));
                     
@@ -80,8 +80,8 @@ public class Commands {
                     res = lib.createEvent(params[1],Integer.valueOf(params[2]), params[3], Integer.valueOf(params[4]), 
                                           java.sql.Date.valueOf(params[5]), Integer.valueOf(params[6]));
                     
-                    jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]+" " + params[3] + " "+
-                                             Integer.valueOf(params[4])+" "+ params[5]+" "+params[6]);
+                    jedis.set(String.valueOf(params[1].hashCode()), params[1] + " " + params[2]+ " " + params[3] + " " +
+                                             Integer.valueOf(params[4])+ " " + params[5]+ " " +params[6]);
                 } catch(Exception e) {
                     throw e;
                 }
@@ -89,7 +89,7 @@ public class Commands {
             case "Articles":
                 try {
                     res = lib.createArticles(params[1], params[2], Integer.valueOf(params[3]));
-                    jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]+" " + params[3]);
+                    jedis.set(String.valueOf(params[1].hashCode()), params[1] + " " + params[2]+ " " + params[3]);
                 } catch(Exception e) {
                     throw e;
                 }
@@ -97,7 +97,7 @@ public class Commands {
             case "developers":
                 try {
                     res = lib.createDevelopers(params[1], params[2]);
-                    jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]);
+                    jedis.set(String.valueOf(params[1].hashCode()), params[1] + " " + params[2]);
                 } catch(Exception e) {
                     throw e;
                 }
@@ -105,7 +105,7 @@ public class Commands {
             case "users_com":
                 try {
                     res = lib.addUserToComminuty(params[1], params[2]);
-                    jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]);
+                    jedis.set(String.valueOf(params[1].hashCode()), params[1] + " " + params[2]);
                 } catch(Exception e) {
                     throw e;
                 }
@@ -125,8 +125,8 @@ public class Commands {
                 case "users":
                     res = lib.updateUser(params[1], params[2], Integer.valueOf(params[3]));
                     break;
-                case "games":
-                    res = lib.updateGame(params[1], params[2], Integer.valueOf(params[3]),
+                case "musics":
+                    res = lib.updatemusic(params[1], params[2], Integer.valueOf(params[3]),
                                           params[4], null, Integer.valueOf(params[5]));
                     break;
                 case "communities":
@@ -157,8 +157,8 @@ public class Commands {
                 case "users":
                     res = lib.deleteUser(params[1]);
                     break;
-                case "games":
-                    res = lib.deleteGame(params[1]);
+                case "musics":
+                    res = lib.deletemusic(params[1]);
                     break;
                 case "communities":
                     res = lib.deleteCommunity(params[1]);
@@ -175,7 +175,7 @@ public class Commands {
                 case "users_com":
                     try {
                         res = lib.deleteUserFromCommunity(params[1], params[2]);
-                        jedis.set(String.valueOf(params[1].hashCode()), params[1] +" "+ params[2]);
+                        jedis.set(String.valueOf(params[1].hashCode()), params[1] + " " + params[2]);
                     } catch(Exception e) {
                         throw e;
                     }
@@ -195,9 +195,9 @@ public class Commands {
                     throw e;
                 }
                 break;
-            case "games":
+            case "musics":
                 try {
-                        lib.viewGames(params[1]);
+                        lib.viewmusics(params[1]);
                 } catch(Exception e) {
                     throw e;
                 }
@@ -243,11 +243,11 @@ public class Commands {
         return 0;
     }
 
-    public int buygame(String... params) throws Exception{
+    public int buymusic(String... params) throws Exception{
         int res = 0;
         try {
-            System.out.println("Called buygame");
-            lib.buyGame(params[0], params[1]);
+            System.out.println("Called buymusic");
+            lib.buymusic(params[0], params[1]);
         }
         catch(Exception e){
             throw e;
@@ -255,11 +255,11 @@ public class Commands {
         return res;
     }
 
-    public int seeAcquiredGames(String... params) throws Exception{
+    public int seeAcquiredmusics(String... params) throws Exception{
         int res = 0;
         try {
-            System.out.println("Called seeAcquiredGames");
-            lib.seeAcquiredGames();
+            System.out.println("Called seeAcquiredmusics");
+            lib.seeAcquiredmusics();
         }
         catch(Exception e){
             throw e;
@@ -279,11 +279,11 @@ public class Commands {
         return res;
     }
 
-    public int findgames(String... params) throws Exception {
+    public int findmusics(String... params) throws Exception {
         int res = 0;
         try{
-            System.out.println("Called findgames");
-            lib.findGamesByGenre(params[0]);
+            System.out.println("Called findmusics");
+            lib.findmusicsByGenre(params[0]);
         }
         catch(Exception e){
             throw e;
